@@ -1,4 +1,4 @@
-import { City } from 'types/interfaces'
+import { City, Flight } from 'types/interfaces'
 import axiosInstance from './axios'
 
 /**
@@ -20,7 +20,15 @@ class Api {
 	// add api request methods below
 
 	public async getCities() {
-		return await this.axios.get<City[]>("Cities")
+		return await this.axios.get<City[]>('Cities')
+	}
+
+	public async getFlightsByCity(cityFrom?: string, cityTo?: string) {
+		const params = new URLSearchParams()
+		if(cityFrom) params.append('cityFrom', cityFrom)
+		if(cityTo) params.append('cityTo', cityTo)
+
+		return await this.axios.get<Flight[]>(`Flights/ByCity?${params}`)
 	}
 	
 }
