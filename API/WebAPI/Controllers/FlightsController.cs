@@ -9,9 +9,7 @@ using WebAPI.Models.Database;
 
 namespace WebAPI.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class FlightsController : ControllerBase
+    public class FlightsController : BaseApiController
     {
         private readonly DataContext _context;
 
@@ -33,27 +31,32 @@ namespace WebAPI.Controllers
 
         // GET: api/Flights/City?city=Berlin&from=true
         [HttpGet]
-        [Route("/ByCity")]
-        public async Task<ActionResult<IEnumerable<Flight>>> GetFlightsByCity(string city, bool? from)
+        [Route("ByCity")]
+        public async Task<ActionResult<IEnumerable<Flight>>> GetFlightsByCity(string? cityFrom, string? cityTo)
         {
             if (_context.Flights == null)
             {
                 return NotFound();
             }
 
-            var cityIds = await _context.Cities.Where(c => c.Name == city).Select(c => c.Id).ToListAsync();
+            var cityIdsFrom = await _context.Cities.Where(c => c.Name == cityFrom).Select(c => c.Id).ToListAsync();
+            var cityIdsTo = await _context.Cities.Where(c => c.Name == cityTo).Select(c => c.Id).ToListAsync();
 
-            if (from == true)
+            if (cityFrom != null && cityTo != null)
             {
-                return(await _context.Flights.Where(f => cityIds.Contains(f.CityFromId)).ToListAsync());
+                return (await _context.Flights.Where(f => cityIdsFrom.Contains(f.CityFromId) && cityIdsTo.Contains(f.CityToId)).ToListAsync());
             }
-            else if (from == false)
+            else if (cityFrom != null && cityTo == null)
             {
-                return(await _context.Flights.Where(f => cityIds.Contains(f.CityToId)).ToListAsync());
+                return (await _context.Flights.Where(f => cityIdsFrom.Contains(f.CityFromId)).ToListAsync());
+            }
+            else if (cityFrom == null && cityTo != null)
+            {
+                return (await _context.Flights.Where(f => cityIdsTo.Contains(f.CityToId)).ToListAsync());
             }
             else
             {
-                return(await _context.Flights.Where(f => cityIds.Contains(f.CityToId) || cityIds.Contains(f.CityFromId)).ToListAsync());
+                return BadRequest("City From and City To are both empty");
             }
         }
 

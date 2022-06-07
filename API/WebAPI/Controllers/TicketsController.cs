@@ -9,9 +9,7 @@ using WebAPI.Models.Database;
 
 namespace WebAPI.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class TicketsController : ControllerBase
+    public class TicketsController : BaseApiController
     {
         private readonly DataContext _context;
 

@@ -9,9 +9,7 @@ using WebAPI.Models.Database;
 
 namespace WebAPI.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class CitiesController : ControllerBase
+    public class CitiesController : BaseApiController
     {
         private readonly DataContext _context;
 
