@@ -31,6 +31,32 @@ namespace WebAPI.Controllers
             return await _context.Flights.ToListAsync();
         }
 
+        // GET: api/Flights/City?city=Berlin&from=true
+        [HttpGet]
+        [Route("/ByCity")]
+        public async Task<ActionResult<IEnumerable<Flight>>> GetFlightsByCity(string city, bool? from)
+        {
+            if (_context.Flights == null)
+            {
+                return NotFound();
+            }
+
+            var cityIds = await _context.Cities.Where(c => c.Name == city).Select(c => c.Id).ToListAsync();
+
+            if (from == true)
+            {
+                return(await _context.Flights.Where(f => cityIds.Contains(f.CityFromId)).ToListAsync());
+            }
+            else if (from == false)
+            {
+                return(await _context.Flights.Where(f => cityIds.Contains(f.CityToId)).ToListAsync());
+            }
+            else
+            {
+                return(await _context.Flights.Where(f => cityIds.Contains(f.CityToId) || cityIds.Contains(f.CityFromId)).ToListAsync());
+            }
+        }
+
         // GET: api/Flights/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Flight>> GetFlight(int id)
