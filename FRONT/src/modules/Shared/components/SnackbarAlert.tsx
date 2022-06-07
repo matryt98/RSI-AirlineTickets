@@ -19,7 +19,7 @@ const SnackbarAlert = () => {
 				horizontal: 'center',
 			}}
 			open={isOpen}
-			autoHideDuration={3000}
+			autoHideDuration={5000}
 			onClose={handleClose}
 		>
 			<Alert 

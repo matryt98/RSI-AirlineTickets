@@ -1,3 +1,3 @@
 import { RootState } from "app/store"
 
-export const getMessages = (state: RootState) => state.home.messages
+export const getCities = (state: RootState) => state.home.cities

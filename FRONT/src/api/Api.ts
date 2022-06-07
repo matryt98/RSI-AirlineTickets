@@ -1,4 +1,4 @@
-import { Message } from 'types/interfaces'
+import { City } from 'types/interfaces'
 import axiosInstance from './axios'
 
 /**
@@ -19,15 +19,8 @@ class Api {
 
 	// add api request methods below
 
-	public async getMessages() {
-		return await this.axios.get<Message[]>("Messages/GetMessages")
-	}
-
-	public async deleteMessage(id: number) {
-		const params = new URLSearchParams()
-		params.append('id', id.toString())
-
-		return await this.axios.delete(`Messages/DeleteMessage?${params}`)
+	public async getCities() {
+		return await this.axios.get<City[]>("Cities")
 	}
 	
 }

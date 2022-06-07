@@ -1,22 +1,9 @@
-import { createAction, createAsyncThunk } from "@reduxjs/toolkit"
 import { Api } from "api"
+import { createApiCall } from "app/helpers/store"
 
 const api = new Api()
 
-export const getMessages = createAsyncThunk(
-	'home/getMessages',
-	async(_ , thunkAPI) => {
-		const response = await api.getMessages()
-		return response.data
-	}
-)
-
-export const resetMessages = createAction('home/resetMessages')
-
-export const deleteMessage = createAsyncThunk(
-	'home/deleteMessage',
-	async(id: number , thunkAPI) => {
-		const response = await api.deleteMessage(id)
-		return response.data
-	}
+export const getCities = createApiCall(
+	'home/getCities',
+	api.getCities()
 )
