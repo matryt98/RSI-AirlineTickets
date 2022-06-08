@@ -2,20 +2,23 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.Models.Database;
+using WebAPI.Models.Dtos;
 
 namespace WebAPI.Controllers
 {
     public class FlightsController : BaseApiController
     {
         private readonly DataContext _context;
-
-        public FlightsController(DataContext context)
+        private readonly IMapper _mapper;
+        public FlightsController(DataContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // GET: api/Flights
@@ -31,8 +34,8 @@ namespace WebAPI.Controllers
 
         // GET: api/Flights/City?city=Berlin&from=true
         [HttpGet]
-        [Route("ByCity")]
-        public async Task<ActionResult<IEnumerable<Flight>>> GetFlightsByCity(string? cityFrom, string? cityTo)
+        [Route("Search")]
+        public async Task<ActionResult<IEnumerable<FlightDto>>> GetFlights(string? cityFrom, string? cityTo, string date)
         {
             if (_context.Flights == null)
             {
@@ -41,18 +44,43 @@ namespace WebAPI.Controllers
 
             var cityIdsFrom = await _context.Cities.Where(c => c.Name == cityFrom).Select(c => c.Id).ToListAsync();
             var cityIdsTo = await _context.Cities.Where(c => c.Name == cityTo).Select(c => c.Id).ToListAsync();
+            var flightsList = new List<Flight>();
 
             if (cityFrom != null && cityTo != null)
             {
-                return (await _context.Flights.Where(f => cityIdsFrom.Contains(f.CityFromId) && cityIdsTo.Contains(f.CityToId)).ToListAsync());
+                flightsList = await _context.Flights
+                    .Where(f => cityIdsFrom.Contains(f.CityFromId) 
+                        && cityIdsTo.Contains(f.CityToId) 
+                        && f.Arrival <= DateTime.Parse(date).AddHours(12)
+                        && f.Departure >= DateTime.Parse(date))
+                    .Include(x => x.CityFrom)
+                    .Include(x => x.CityTo)
+                    .ToListAsync();
+                var result = _mapper.Map<List<FlightDto>>(flightsList);
+                return result;
             }
             else if (cityFrom != null && cityTo == null)
             {
-                return (await _context.Flights.Where(f => cityIdsFrom.Contains(f.CityFromId)).ToListAsync());
+                flightsList = await _context.Flights
+                    .Where(f => cityIdsFrom.Contains(f.CityFromId) 
+                        && f.Departure >= DateTime.Parse(date)
+                        && f.Arrival < DateTime.Parse(date).AddHours(12))
+                    .Include(x => x.CityFrom)
+                    .Include(x => x.CityTo)
+                    .ToListAsync();
+                var result = _mapper.Map<List<FlightDto>>(flightsList);
+                return result;
             }
             else if (cityFrom == null && cityTo != null)
             {
-                return (await _context.Flights.Where(f => cityIdsTo.Contains(f.CityToId)).ToListAsync());
+                flightsList = await _context.Flights
+                    .Where(f => cityIdsTo.Contains(f.CityToId) 
+                        && f.Departure >= DateTime.Parse(date)
+                        && f.Arrival <= DateTime.Parse(date).AddHours(12))
+                    .Include(x => x.CityFrom)
+                    .Include(x => x.CityTo).ToListAsync();
+                var result = _mapper.Map<List<FlightDto>>(flightsList);
+                return result;
             }
             else
             {
