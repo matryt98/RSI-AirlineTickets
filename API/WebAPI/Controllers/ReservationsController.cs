@@ -13,6 +13,7 @@ using MigraDocCore.DocumentObjectModel.Shapes;
 using MigraDocCore.DocumentObjectModel.Tables;
 using System.Xml.XPath;
 using MigraDocCore.Rendering;
+using PdfSharpCore.Drawing.Layout;
 
 namespace WebAPI.Controllers
 {
@@ -102,52 +103,156 @@ namespace WebAPI.Controllers
 
         [HttpPost]
         [Route("GeneratePDF")]
-        public void GeneratePDF()
+        public async Task GeneratePDFAsync(int reservationId)
         {
-            Document document = new Document();
+            var ticketsList = await _context.Tickets.Where(t => t.ReservationId == reservationId).ToListAsync();
 
-            // Add a section to the document
-            Section section = document.AddSection();
+            PdfDocument document = new PdfDocument();
+            document.Info.Title = "Bought tickets";
 
-            // Add a paragraph to the section
-            Paragraph paragraph = section.AddParagraph();
-            paragraph.Format.Font.Color = Color.FromCmyk(100, 30, 20, 50);
+            for (int p = 0; p < 1; p++)
+            {
+                // Page Options
+                PdfPage pdfPage = document.AddPage();
+                pdfPage.Height = 842;//842
+                pdfPage.Width = 590;
 
-            // Add some text to the paragraph
-            paragraph.AddFormattedText("Hello, World!", TextFormat.Bold);
+                // Get an XGraphics object for drawing
+                XGraphics graph = XGraphics.FromPdfPage(pdfPage);
 
-            document.UseCmykColor = true;
+                // Text format
+                XStringFormat format = new XStringFormat();
+                format.LineAlignment = XLineAlignment.Near;
+                format.Alignment = XStringAlignment.Near;
+                var tf = new XTextFormatter(graph);
 
-            // ===== Unicode encoding and font program embedding in MigraDocCore is demonstrated here =====
+                XFont fontParagraph = new XFont("Verdana", 8, XFontStyle.Regular);
 
-            // A flag indicating whether to create a Unicode PDF or a WinAnsi PDF file.
-            // This setting applies to all fonts used in the PDF document.
-            // This setting has no effect on the RTF renderer.
-            const bool unicode = false;
+                // Row elements
+                int el1_width = 80;
+                int el2_width = 380;
 
-            // An enum indicating whether to embed fonts or not.
-            // This setting applies to all font programs used in the document.
-            // This setting has no effect on the RTF renderer.
-            // (The term 'font program' is used by Adobe for a file containing a font. Technically a 'font file'
-            // is a collection of small programs and each program renders the glyph of a character when executed.
-            // Using a font in PdfSharpCore may lead to the embedding of one or more font programs, because each outline
-            // (regular, bold, italic, bold+italic, ...) has its own font program)
-            //const PdfFontEmbedding embedding = PdfFontEmbedding.Always;
+                // page structure options
+                double lineHeight = 20;
+                int marginLeft = 20;
+                int marginTop = 20;
 
-            // ========================================================================================
+                int el_height = 30;
+                int rect_height = 17;
 
-            // Create a renderer for the MigraDocCore document.
-            PdfDocumentRenderer pdfRenderer = new PdfDocumentRenderer(unicode);
+                int interLine_X_1 = 2;
+                int interLine_X_2 = 2 * interLine_X_1;
 
-            // Associate the MigraDocCore document with a renderer
-            pdfRenderer.Document = document;
+                int offSetX_1 = el1_width;
+                int offSetX_2 = el1_width + el2_width;
 
-            // Layout and render document to PDF
-            pdfRenderer.RenderDocument();
+                XSolidBrush rect_style1 = new XSolidBrush(XColors.LightGray);
+                XSolidBrush rect_style2 = new XSolidBrush(XColors.DarkGreen);
+                XSolidBrush rect_style3 = new XSolidBrush(XColors.Red);
 
-            // Save the document...
+                for (int i = 0; i < ticketsList.Count(); i++)
+                {
+                    double dist_Y = lineHeight * (i + 1);
+                    double dist_Y2 = dist_Y - 2;
+
+                    // header della G
+                    if (i == 0)
+                    {
+                        graph.DrawRectangle(rect_style2, marginLeft, marginTop, pdfPage.Width - 2 * marginLeft, rect_height);
+
+                        tf.DrawString("Id", fontParagraph, XBrushes.White,
+                                      new XRect(marginLeft, marginTop, el1_width, el_height), format);
+
+                        tf.DrawString("Name", fontParagraph, XBrushes.White,
+                                      new XRect(marginLeft + offSetX_1 + interLine_X_1, marginTop, el2_width, el_height), format);
+
+                        tf.DrawString("column3", fontParagraph, XBrushes.White,
+                                      new XRect(marginLeft + offSetX_2 + 2 * interLine_X_2, marginTop, el1_width, el_height), format);
+
+                        // stampo il primo elemento insieme all'header
+                        graph.DrawRectangle(rect_style1, marginLeft, dist_Y2 + marginTop, el1_width, rect_height);
+                        tf.DrawString("text1", fontParagraph, XBrushes.Black,
+                                      new XRect(marginLeft, dist_Y + marginTop, el1_width, el_height), format);
+
+                        //ELEMENT 2 - BIG 380
+                        graph.DrawRectangle(rect_style1, marginLeft + offSetX_1 + interLine_X_1, dist_Y2 + marginTop, el2_width, rect_height);
+                        tf.DrawString(
+                            "text2",
+                            fontParagraph,
+                            XBrushes.Black,
+                            new XRect(marginLeft + offSetX_1 + interLine_X_1, dist_Y + marginTop, el2_width, el_height),
+                            format);
+
+
+                        //ELEMENT 3 - SMALL 80
+
+                        graph.DrawRectangle(rect_style1, marginLeft + offSetX_2 + interLine_X_2, dist_Y2 + marginTop, el1_width, rect_height);
+                        tf.DrawString(
+                            "text3",
+                            fontParagraph,
+                            XBrushes.Black,
+                            new XRect(marginLeft + offSetX_2 + 2 * interLine_X_2, dist_Y + marginTop, el1_width, el_height),
+                            format);
+
+
+                    }
+                    else
+                    {
+
+                        //if (i % 2 == 1)
+                        //{
+                        //  graph.DrawRectangle(TextBackgroundBrush, marginLeft, lineY - 2 + marginTop, pdfPage.Width - marginLeft - marginRight, lineHeight - 2);
+                        //}
+
+                        //ELEMENT 1 - SMALL 80
+                        graph.DrawRectangle(rect_style1, marginLeft, marginTop + dist_Y2, el1_width, rect_height);
+                        tf.DrawString(
+
+                            "text1",
+                            fontParagraph,
+                            XBrushes.Black,
+                            new XRect(marginLeft, marginTop + dist_Y, el1_width, el_height),
+                            format);
+
+                        //ELEMENT 2 - BIG 380
+                        graph.DrawRectangle(rect_style1, marginLeft + offSetX_1 + interLine_X_1, dist_Y2 + marginTop, el2_width, rect_height);
+                        tf.DrawString(
+                            "text2",
+                            fontParagraph,
+                            XBrushes.Black,
+                            new XRect(marginLeft + offSetX_1 + interLine_X_1, marginTop + dist_Y, el2_width, el_height),
+                            format);
+
+
+                        //ELEMENT 3 - SMALL 80
+
+                        graph.DrawRectangle(rect_style1, marginLeft + offSetX_2 + interLine_X_2, dist_Y2 + marginTop, el1_width, rect_height);
+                        tf.DrawString(
+                            "text3",
+                            fontParagraph,
+                            XBrushes.Black,
+                            new XRect(marginLeft + offSetX_2 + 2 * interLine_X_2, marginTop + dist_Y, el1_width, el_height),
+                            format);
+
+                    }
+
+                }
+
+
+            }
+
+
             const string filename = "HelloWorld.pdf";
-            pdfRenderer.PdfDocument.Save(filename);
+            document.Save(filename);
+
+            //byte[] bytes = null;
+            //using (MemoryStream stream = new MemoryStream())
+            //{
+            //    document.Save(stream, true);
+            //    bytes = stream.ToArray();
+            //}
+
+            //SendFileToResponse(bytes, "HelloWorld_test.pdf");
 
         }
 
