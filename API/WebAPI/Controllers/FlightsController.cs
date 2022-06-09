@@ -51,8 +51,8 @@ namespace WebAPI.Controllers
                 flightsList = await _context.Flights
                     .Where(f => cityIdsFrom.Contains(f.CityFromId) 
                         && cityIdsTo.Contains(f.CityToId) 
-                        && f.Arrival <= DateTime.Parse(date).AddHours(12)
-                        && f.Departure >= DateTime.Parse(date))
+                        && f.Departure >= DateTime.Parse(date)
+                        && f.Departure <= DateTime.Parse(date).AddHours(12))
                     .Include(x => x.CityFrom)
                     .Include(x => x.CityTo)
                     .ToListAsync();
@@ -64,7 +64,7 @@ namespace WebAPI.Controllers
                 flightsList = await _context.Flights
                     .Where(f => cityIdsFrom.Contains(f.CityFromId) 
                         && f.Departure >= DateTime.Parse(date)
-                        && f.Arrival < DateTime.Parse(date).AddHours(12))
+                        && f.Departure <= DateTime.Parse(date).AddHours(12))
                     .Include(x => x.CityFrom)
                     .Include(x => x.CityTo)
                     .ToListAsync();
@@ -76,7 +76,7 @@ namespace WebAPI.Controllers
                 flightsList = await _context.Flights
                     .Where(f => cityIdsTo.Contains(f.CityToId) 
                         && f.Departure >= DateTime.Parse(date)
-                        && f.Arrival <= DateTime.Parse(date).AddHours(12))
+                        && f.Departure <= DateTime.Parse(date).AddHours(12))
                     .Include(x => x.CityFrom)
                     .Include(x => x.CityTo).ToListAsync();
                 var result = _mapper.Map<List<FlightDto>>(flightsList);

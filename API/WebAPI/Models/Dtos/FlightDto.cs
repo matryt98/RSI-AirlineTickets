@@ -10,5 +10,6 @@ namespace WebAPI.Models.Dtos
         public DateTime Departure { get; set; }
         public DateTime Arrival { get; set; }
         public TimeSpan TimeSpan { get; set; }
+        public decimal Price { get; set; }
     }
 }

@@ -10,5 +10,6 @@
         public DateTime Departure { get; set; }
         public DateTime Arrival { get; set; }
         public virtual List<Reservation>? Reservations { get; set; }
+        public decimal Price { get; set; }
     }
 }

@@ -105,7 +105,7 @@ namespace WebAPI.Controllers
         [Route("GeneratePDF")]
         public async Task GeneratePDFAsync(int reservationId)
         {
-            var ticketsList = await _context.Tickets.Where(t => t.ReservationId == reservationId).ToListAsync();
+            var reservation = await _context.Reservations.Where(r => r.Id == reservationId).Include(x => x.Flight).Include(x => x.Tickets).ToListAsync();
 
             PdfDocument document = new PdfDocument();
             document.Info.Title = "Bought tickets";
@@ -130,7 +130,7 @@ namespace WebAPI.Controllers
 
                 // Row elements
                 int el1_width = 80;
-                int el2_width = 380;
+                int el2_width = 100;
 
                 // page structure options
                 double lineHeight = 20;
@@ -142,15 +142,17 @@ namespace WebAPI.Controllers
 
                 int interLine_X_1 = 2;
                 int interLine_X_2 = 2 * interLine_X_1;
+                int interLine_X_3 = 2 * interLine_X_2;
 
                 int offSetX_1 = el1_width;
                 int offSetX_2 = el1_width + el2_width;
+                int offSetX_3 = el1_width + el2_width + el2_width;
 
                 XSolidBrush rect_style1 = new XSolidBrush(XColors.LightGray);
                 XSolidBrush rect_style2 = new XSolidBrush(XColors.DarkGreen);
                 XSolidBrush rect_style3 = new XSolidBrush(XColors.Red);
 
-                for (int i = 0; i < ticketsList.Count(); i++)
+                for (int i = 0; i < reservation.First().Tickets.Count(); i++)
                 {
                     double dist_Y = lineHeight * (i + 1);
                     double dist_Y2 = dist_Y - 2;
@@ -160,14 +162,17 @@ namespace WebAPI.Controllers
                     {
                         graph.DrawRectangle(rect_style2, marginLeft, marginTop, pdfPage.Width - 2 * marginLeft, rect_height);
 
-                        tf.DrawString("Id", fontParagraph, XBrushes.White,
+                        tf.DrawString("Ticket", fontParagraph, XBrushes.White,
                                       new XRect(marginLeft, marginTop, el1_width, el_height), format);
 
                         tf.DrawString("Name", fontParagraph, XBrushes.White,
                                       new XRect(marginLeft + offSetX_1 + interLine_X_1, marginTop, el2_width, el_height), format);
 
-                        tf.DrawString("column3", fontParagraph, XBrushes.White,
+                        tf.DrawString("Flight", fontParagraph, XBrushes.White,
                                       new XRect(marginLeft + offSetX_2 + 2 * interLine_X_2, marginTop, el1_width, el_height), format);
+
+                        tf.DrawString("Price", fontParagraph, XBrushes.White,
+                                      new XRect(marginLeft + offSetX_3 + 2 * interLine_X_3, marginTop, el1_width, el_height), format);
 
                         // stampo il primo elemento insieme all'header
                         graph.DrawRectangle(rect_style1, marginLeft, dist_Y2 + marginTop, el1_width, rect_height);
@@ -192,6 +197,14 @@ namespace WebAPI.Controllers
                             fontParagraph,
                             XBrushes.Black,
                             new XRect(marginLeft + offSetX_2 + 2 * interLine_X_2, dist_Y + marginTop, el1_width, el_height),
+                            format);
+
+                        graph.DrawRectangle(rect_style1, marginLeft + offSetX_3 + interLine_X_3, dist_Y2 + marginTop, el1_width, rect_height);
+                        tf.DrawString(
+                            "text4",
+                            fontParagraph,
+                            XBrushes.Black,
+                            new XRect(marginLeft + offSetX_3 + 2 * interLine_X_3, dist_Y + marginTop, el1_width, el_height),
                             format);
 
 
