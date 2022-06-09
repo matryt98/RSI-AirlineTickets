@@ -7,12 +7,12 @@ import theme from "app/theme"
 import { Loader, SnackbarAlert } from "modules/Shared/components"
 import { Provider } from "react-redux"
 import { BrowserRouter, Route, Routes } from "react-router-dom"
-import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 
 const App = () => {
 	return (
 		<Provider store={store}>
-			<LocalizationProvider dateAdapter={AdapterMoment}>
+			<LocalizationProvider dateAdapter={AdapterDateFns}>
 				<ThemeProvider theme={theme}>
 					<CssBaseline />
 					<BrowserRouter>

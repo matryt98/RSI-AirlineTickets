@@ -1,10 +1,17 @@
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit'
+import { actions } from 'modules/Home/store'
 import reducers from './reducers'
 
 export const store = configureStore({
   reducer: {
     ...reducers
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: [actions.makeReservation.fulfilled.name]
+      }
+    }),
 })
 
 export type AppDispatch = typeof store.dispatch

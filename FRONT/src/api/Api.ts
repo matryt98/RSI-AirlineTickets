@@ -1,4 +1,5 @@
-import { City, Flight } from 'types/interfaces'
+import { AxiosRequestConfig } from 'axios'
+import { City, Flight, FlightDto, Reservation } from 'types/interfaces'
 import axiosInstance from './axios'
 
 /**
@@ -23,12 +24,25 @@ class Api {
 		return await this.axios.get<City[]>('Cities')
 	}
 
-	public async getFlightsByCity(cityFrom?: string, cityTo?: string) {
+	public async getFlightsByCity(date: Date, cityFrom?: string, cityTo?: string) {
 		const params = new URLSearchParams()
+		params.append('date', date.toLocaleString())
 		if(cityFrom) params.append('cityFrom', cityFrom)
 		if(cityTo) params.append('cityTo', cityTo)
 
-		return await this.axios.get<Flight[]>(`Flights/ByCity?${params}`)
+		return await this.axios.get<FlightDto[]>(`Flights/Search?${params}`)
+	}
+
+	public async getFlight(id: number) {
+		return await this.axios.get<Flight>(`Flights/${id}`)
+	}
+
+	public async createReservation(reservation: Reservation) {
+		const options: AxiosRequestConfig = {
+			responseType: 'blob',
+		}
+
+		return await this.axios.post('Reservations', reservation, options)
 	}
 	
 }

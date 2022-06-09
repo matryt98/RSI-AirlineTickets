@@ -20,20 +20,32 @@ export interface City extends Entity {
 }
 
 export interface Flight extends Entity {
-  cityFromId: number
-  cityToId: number
-  departure: Date
-  arrival: Date
+  price: number
+}
+
+export interface FlightDto extends Entity {
+  cityFrom: string
+  cityTo: string
+  departure: string
+  arrival: string
+  timeSpan: string
 }
 
 export interface Reservation extends Entity {
   flightId: number
 }
 
-export interface Ticket extends Entity {
-  reservationId: number
-  name: string
-  surname: string
-  pesel: string
-  price: string
+export interface BuyTicketFormValues {
+	name: string
+	surname: string
+	email: string
+	numberOfTickets: number
+}
+
+export interface Reservation extends Entity {
+  flightId: number
+	name: string
+	surname: string
+	email: string
+	tickets: number
 }
