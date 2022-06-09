@@ -1,111 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using WebAPI.Models.Database;
-using PdfSharpCore.Pdf;
-using PdfSharpCore.Drawing;
-using MigraDocCore.DocumentObjectModel;
-using MigraDocCore.DocumentObjectModel.Shapes;
-using MigraDocCore.DocumentObjectModel.Tables;
-using System.Xml.XPath;
-using MigraDocCore.Rendering;
+﻿using PdfSharpCore.Drawing;
 using PdfSharpCore.Drawing.Layout;
-using WebAPI.Helpers;
+using PdfSharpCore.Pdf;
+using WebAPI.Models.Database;
 
-namespace WebAPI.Controllers
+namespace WebAPI.Helpers
 {
-    public class ReservationsController : BaseApiController
+    public static class PdfHelper
     {
-        private readonly DataContext _context;
-
-        public ReservationsController(DataContext context)
+        public static byte[] GeneratePdf(Reservation reservation)
         {
-            _context = context;
-        }
-
-        // GET: api/Reservations
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Reservation>>> GetReservations()
-        {
-          if (_context.Reservations == null)
-          {
-              return NotFound();
-          }
-            return await _context.Reservations.ToListAsync();
-        }
-
-        // GET: api/Reservations/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Reservation>> GetReservation(int id)
-        {
-          if (_context.Reservations == null)
-          {
-              return NotFound();
-          }
-            var reservation = await _context.Reservations.FindAsync(id);
-
-            if (reservation == null)
-            {
-                return NotFound();
-            }
-
-            return reservation;
-        }
-
-        // PUT: api/Reservations/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutReservation(int id, Reservation reservation)
-        {
-            if (id != reservation.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(reservation).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ReservationExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        [HttpPost]
-        public async Task<FileContentResult> MakeReservation(Reservation reservation)
-        {
-            _context.Reservations.Add(reservation);
-
-            var reservations = await _context.Reservations.Where(r => r.Id == reservation.Id).Include(x => x.Flight).ToListAsync();
-
-            await _context.SaveChangesAsync();
-
-            var bytes = PdfHelper.GeneratePdf(reservations.First());
-
-            return File(bytes, "application/octet-stream", $"Reservation-{reservation.Id}");
-        }
-
-        [HttpPost]
-        [Route("GeneratePDF")]
-        public async Task<FileContentResult> GeneratePDFAsync(int reservationId)
-        {
-            var reservation = await _context.Reservations.Where(r => r.Id == reservationId).Include(x => x.Flight).ToListAsync();
 
             PdfDocument document = new PdfDocument();
             document.Info.Title = "Bought tickets";
@@ -182,7 +85,7 @@ namespace WebAPI.Controllers
                         // stampo il primo elemento insieme all'header
                         //graph.DrawRectangle(rect_style1, marginLeft, dist_Y2 + marginTop, el1_width, rect_height);
                         tf.DrawString(
-                            reservation.First().Id.ToString(), 
+                            reservation.Id.ToString(), 
                             fontParagraph, 
                             XBrushes.Black,
                             new XRect(marginLeft, dist_Y + marginTop, el1_width, el_height), format);
@@ -190,7 +93,7 @@ namespace WebAPI.Controllers
                         //ELEMENT 2 - BIG 380
                         //graph.DrawRectangle(rect_style1, marginLeft + offSetX_1 + interLine_X_1, dist_Y2 + marginTop, el2_width, rect_height);
                         tf.DrawString(
-                            reservation.First().FlightId.ToString(),
+                            reservation.FlightId.ToString(),
                             fontParagraph,
                             XBrushes.Black,
                             new XRect(marginLeft + offSetX_1, marginTop + dist_Y, el1_width, el_height), format);
@@ -200,25 +103,25 @@ namespace WebAPI.Controllers
 
                         //graph.DrawRectangle(rect_style1, marginLeft + offSetX_2 + interLine_X_1, dist_Y2 + marginTop, el1_width, rect_height);
                         tf.DrawString(
-                            reservation.First().Name + " " + reservation.First().Surname,
+                            reservation.Name + " " + reservation.Surname,
                             fontParagraph,
                             XBrushes.Black,
                             new XRect(marginLeft + offSetX_1 * 2, dist_Y + marginTop, el2_width, el_height), format);
 
                         tf.DrawString(
-                            reservation.First().Email,
+                            reservation.Email,
                             fontParagraph,
                             XBrushes.Black,
                             new XRect(marginLeft + offSetX_1 * 4, dist_Y + marginTop, el1_width, el_height), format);
 
                         tf.DrawString(
-                            reservation.First().Tickets.ToString(),
+                            reservation.Tickets.ToString(),
                             fontParagraph,
                             XBrushes.Black,
                             new XRect(marginLeft + offSetX_1 * 5, dist_Y + marginTop, el1_width, el_height), format);
 
                         tf.DrawString(
-                            (reservation.First().Flight.Price * reservation.First().Tickets).ToString() + "PLN",
+                            (reservation.Flight.Price * reservation.Tickets).ToString() + "PLN",
                             fontParagraph,
                             XBrushes.Black,
                             new XRect(marginLeft + offSetX_1 * 6, dist_Y + marginTop, el1_width, el_height), format);
@@ -275,33 +178,8 @@ namespace WebAPI.Controllers
                 document.Save(stream, true);
                 bytes = stream.ToArray();
             }
-            return File(bytes, "application/octet-stream", $"Reservation-{reservationId}");
+            return bytes;
 
-        }
-
-        // DELETE: api/Reservations/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteReservation(int id)
-        {
-            if (_context.Reservations == null)
-            {
-                return NotFound();
-            }
-            var reservation = await _context.Reservations.FindAsync(id);
-            if (reservation == null)
-            {
-                return NotFound();
-            }
-
-            _context.Reservations.Remove(reservation);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool ReservationExists(int id)
-        {
-            return (_context.Reservations?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }
