@@ -101,7 +101,7 @@ namespace WebAPI.Controllers
 
         [HttpPost]
         [Route("GeneratePDF")]
-        public async Task GeneratePDFAsync(int reservationId)
+        public async Task<FileContentResult> GeneratePDFAsync(int reservationId)
         {
             var reservation = await _context.Reservations.Where(r => r.Id == reservationId).Include(x => x.Flight).ToListAsync();
 
@@ -128,7 +128,7 @@ namespace WebAPI.Controllers
 
                 // Row elements
                 int el1_width = 80;
-                int el2_width = 100;
+                int el2_width = 160;
 
                 // page structure options
                 double lineHeight = 20;
@@ -144,125 +144,136 @@ namespace WebAPI.Controllers
 
                 int offSetX_1 = el1_width;
                 int offSetX_2 = el1_width + el2_width;
-                int offSetX_3 = el1_width + el2_width + el2_width;
 
                 XSolidBrush rect_style1 = new XSolidBrush(XColors.LightGray);
-                XSolidBrush rect_style2 = new XSolidBrush(XColors.DarkGreen);
+                XSolidBrush rect_style2 = new XSolidBrush(XColors.LightBlue);
                 XSolidBrush rect_style3 = new XSolidBrush(XColors.Red);
 
-                for (int i = 0; i < 2; i++)
-                {
-                    double dist_Y = lineHeight * (i + 1);
+                //for (int i = 0; i < 1; i++)
+                //{
+                    double dist_Y = lineHeight;
                     double dist_Y2 = dist_Y - 2;
 
-                    // header della G
-                    if (i == 0)
-                    {
+                //    // header della G
+                //    if (i == 0)
+                //    {
                         graph.DrawRectangle(rect_style2, marginLeft, marginTop, pdfPage.Width - 2 * marginLeft, rect_height);
 
-                        tf.DrawString("Ticket", fontParagraph, XBrushes.White,
+                        tf.DrawString("Reservation", fontParagraph, XBrushes.White,
                                       new XRect(marginLeft, marginTop, el1_width, el_height), format);
 
-                        tf.DrawString("Name", fontParagraph, XBrushes.White,
-                                      new XRect(marginLeft + offSetX_1 + interLine_X_1, marginTop, el2_width, el_height), format);
-
                         tf.DrawString("Flight", fontParagraph, XBrushes.White,
-                                      new XRect(marginLeft + offSetX_2 + 2 * interLine_X_2, marginTop, el1_width, el_height), format);
+                                      new XRect(marginLeft + offSetX_1, marginTop, el1_width, el_height), format);
+
+                        tf.DrawString("Name", fontParagraph, XBrushes.White,
+                                      new XRect(marginLeft + offSetX_1 * 2, marginTop, el2_width, el_height), format);
+
+                        tf.DrawString("Email", fontParagraph, XBrushes.White,
+                                      new XRect(marginLeft + offSetX_1 * 4, marginTop, el1_width, el_height), format);
+
+                        tf.DrawString("Tickets", fontParagraph, XBrushes.White,
+                                      new XRect(marginLeft + offSetX_1 * 5, marginTop, el1_width, el_height), format);
 
                         tf.DrawString("Price", fontParagraph, XBrushes.White,
-                                      new XRect(marginLeft + offSetX_3 + 2 * interLine_X_3, marginTop, el1_width, el_height), format);
+                                      new XRect(marginLeft + offSetX_1 * 6, marginTop, el1_width, el_height), format);
 
-                        graph.DrawRectangle(rect_style1, marginLeft, dist_Y2 + marginTop, el1_width, rect_height);
-                        tf.DrawString("text1", fontParagraph, XBrushes.Black,
-                                      new XRect(marginLeft, dist_Y + marginTop, el1_width, el_height), format);
+                        // stampo il primo elemento insieme all'header
+                        //graph.DrawRectangle(rect_style1, marginLeft, dist_Y2 + marginTop, el1_width, rect_height);
+                        tf.DrawString(
+                            reservation.First().Id.ToString(), 
+                            fontParagraph, 
+                            XBrushes.Black,
+                            new XRect(marginLeft, dist_Y + marginTop, el1_width, el_height), format);
 
                         //ELEMENT 2 - BIG 380
-                        graph.DrawRectangle(rect_style1, marginLeft + offSetX_1 + interLine_X_1, dist_Y2 + marginTop, el2_width, rect_height);
+                        //graph.DrawRectangle(rect_style1, marginLeft + offSetX_1 + interLine_X_1, dist_Y2 + marginTop, el2_width, rect_height);
                         tf.DrawString(
-                            "text1",
+                            reservation.First().FlightId.ToString(),
                             fontParagraph,
                             XBrushes.Black,
-                            new XRect(marginLeft + offSetX_1 + interLine_X_1, dist_Y + marginTop, el2_width, el_height),
-                            format);
+                            new XRect(marginLeft + offSetX_1, marginTop + dist_Y, el1_width, el_height), format);
 
 
                         //ELEMENT 3 - SMALL 80
 
-                        graph.DrawRectangle(rect_style1, marginLeft + offSetX_2 + interLine_X_2, dist_Y2 + marginTop, el1_width, rect_height);
+                        //graph.DrawRectangle(rect_style1, marginLeft + offSetX_2 + interLine_X_1, dist_Y2 + marginTop, el1_width, rect_height);
                         tf.DrawString(
-                            "text3",
+                            reservation.First().Name + " " + reservation.First().Surname,
                             fontParagraph,
                             XBrushes.Black,
-                            new XRect(marginLeft + offSetX_2 + 2 * interLine_X_2, dist_Y + marginTop, el1_width, el_height),
-                            format);
+                            new XRect(marginLeft + offSetX_1 * 2, dist_Y + marginTop, el2_width, el_height), format);
 
-                        graph.DrawRectangle(rect_style1, marginLeft + offSetX_3 + interLine_X_3, dist_Y2 + marginTop, el1_width, rect_height);
                         tf.DrawString(
-                            "text4",
+                            reservation.First().Email,
                             fontParagraph,
                             XBrushes.Black,
-                            new XRect(marginLeft + offSetX_3 + 2 * interLine_X_3, dist_Y + marginTop, el1_width, el_height),
-                            format);
+                            new XRect(marginLeft + offSetX_1 * 4, dist_Y + marginTop, el1_width, el_height), format);
 
-
-                    }
-                    else
-                    {
-
-                        //if (i % 2 == 1)
-                        //{
-                        //  graph.DrawRectangle(TextBackgroundBrush, marginLeft, lineY - 2 + marginTop, pdfPage.Width - marginLeft - marginRight, lineHeight - 2);
-                        //}
-
-                        //ELEMENT 1 - SMALL 80
-                        graph.DrawRectangle(rect_style1, marginLeft, marginTop + dist_Y2, el1_width, rect_height);
                         tf.DrawString(
-
-                            "text1",
+                            reservation.First().Tickets.ToString(),
                             fontParagraph,
                             XBrushes.Black,
-                            new XRect(marginLeft, marginTop + dist_Y, el1_width, el_height),
-                            format);
+                            new XRect(marginLeft + offSetX_1 * 5, dist_Y + marginTop, el1_width, el_height), format);
 
-                        //ELEMENT 2 - BIG 380
-                        graph.DrawRectangle(rect_style1, marginLeft + offSetX_1 + interLine_X_1, dist_Y2 + marginTop, el2_width, rect_height);
                         tf.DrawString(
-                            "text2",
+                            (reservation.First().Flight.Price * reservation.First().Tickets).ToString() + "PLN",
                             fontParagraph,
                             XBrushes.Black,
-                            new XRect(marginLeft + offSetX_1 + interLine_X_1, marginTop + dist_Y, el2_width, el_height),
-                            format);
+                            new XRect(marginLeft + offSetX_1 * 6, dist_Y + marginTop, el1_width, el_height), format);
+                    //}
+                    //else
+                    //{
+
+                    //    //if (i % 2 == 1)
+                    //    //{
+                    //    //  graph.DrawRectangle(TextBackgroundBrush, marginLeft, lineY - 2 + marginTop, pdfPage.Width - marginLeft - marginRight, lineHeight - 2);
+                    //    //}
+
+                    //    //ELEMENT 1 - SMALL 80
+                    //    //graph.DrawRectangle(rect_style1, marginLeft, marginTop + dist_Y2, el1_width, rect_height);
+                    //    tf.DrawString(
+
+                    //        "text1",
+                    //        fontParagraph,
+                    //        XBrushes.Black,
+                    //        new XRect(marginLeft, marginTop + dist_Y, el1_width, el_height),
+                    //        format);
+
+                    //    //ELEMENT 2 - BIG 380
+                    //    //graph.DrawRectangle(rect_style1, marginLeft + offSetX_1 + interLine_X_1, dist_Y2 + marginTop, el2_width, rect_height);
+                    //    tf.DrawString(
+                    //        "text2",
+                    //        fontParagraph,
+                    //        XBrushes.Black,
+                    //        new XRect(marginLeft + offSetX_1, marginTop + dist_Y, el2_width, el_height),
+                    //        format);
 
 
-                        //ELEMENT 3 - SMALL 80
+                    //    //ELEMENT 3 - SMALL 80
 
-                        graph.DrawRectangle(rect_style1, marginLeft + offSetX_2 + interLine_X_2, dist_Y2 + marginTop, el1_width, rect_height);
-                        tf.DrawString(
-                            "text3",
-                            fontParagraph,
-                            XBrushes.Black,
-                            new XRect(marginLeft + offSetX_2 + 2 * interLine_X_2, marginTop + dist_Y, el1_width, el_height),
-                            format);
+                    //    //graph.DrawRectangle(rect_style1, marginLeft + offSetX_2 + interLine_X_2, dist_Y2 + marginTop, el1_width, rect_height);
+                    //    tf.DrawString(
+                    //        "text3",
+                    //        fontParagraph,
+                    //        XBrushes.Black,
+                    //        new XRect(marginLeft + offSetX_2, marginTop + dist_Y, el1_width, el_height),
+                    //        format);
 
-                    }
-
-                }
-
-
+                    //}
+            //    }
             }
 
 
-            const string filename = "HelloWorld.pdf";
-            document.Save(filename);
+            //const string filename = "HelloWorld.pdf";
+            //document.Save(filename);
 
-            //byte[] bytes = null;
-            //using (MemoryStream stream = new MemoryStream())
-            //{
-            //    document.Save(stream, true);
-            //    bytes = stream.ToArray();
-            //}
-
-            //SendFileToResponse(bytes, "HelloWorld_test.pdf");
+            byte[] bytes = null;
+            using (MemoryStream stream = new MemoryStream())
+            {
+                document.Save(stream, true);
+                bytes = stream.ToArray();
+            }
+            return File(bytes, "application/octet-stream", $"Reservation-{reservationId}");
 
         }
 
