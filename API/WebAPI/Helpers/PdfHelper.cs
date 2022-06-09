@@ -32,8 +32,12 @@ namespace WebAPI.Helpers
                 XFont fontParagraph = new XFont("Verdana", 8, XFontStyle.Regular);
 
                 // Row elements
-                int el1_width = 80;
-                int el2_width = 160;
+                int el1_width = 60;
+                int el2_width = 130;
+                int el3_width = 130;
+                int el4_width = 130;
+                int el5_width = 50;
+                int el6_width = 50;
 
                 // page structure options
                 double lineHeight = 20;
@@ -45,10 +49,13 @@ namespace WebAPI.Helpers
 
                 int interLine_X_1 = 2;
                 int interLine_X_2 = 2 * interLine_X_1;
-                int interLine_X_3 = 2 * interLine_X_2;
 
                 int offSetX_1 = el1_width;
-                int offSetX_2 = el1_width + el2_width;
+                int offSetX_2 = offSetX_1 + el2_width;
+                int offSetX_3 = offSetX_2 + el3_width;
+                int offSetX_4 = offSetX_3 + el4_width;
+                int offSetX_5 = offSetX_4 + el5_width;
+                int offSetX_6 = offSetX_5 + el6_width;
 
                 XSolidBrush rect_style1 = new XSolidBrush(XColors.LightGray);
                 XSolidBrush rect_style2 = new XSolidBrush(XColors.LightBlue);
@@ -67,20 +74,20 @@ namespace WebAPI.Helpers
                         tf.DrawString("Reservation", fontParagraph, XBrushes.White,
                                       new XRect(marginLeft, marginTop, el1_width, el_height), format);
 
-                        tf.DrawString("Flight", fontParagraph, XBrushes.White,
+                        tf.DrawString("Dest-Arr", fontParagraph, XBrushes.White,
                                       new XRect(marginLeft + offSetX_1, marginTop, el1_width, el_height), format);
 
                         tf.DrawString("Name", fontParagraph, XBrushes.White,
-                                      new XRect(marginLeft + offSetX_1 * 2, marginTop, el2_width, el_height), format);
+                                      new XRect(marginLeft + offSetX_2, marginTop, el2_width, el_height), format);
 
                         tf.DrawString("Email", fontParagraph, XBrushes.White,
-                                      new XRect(marginLeft + offSetX_1 * 4, marginTop, el1_width, el_height), format);
+                                      new XRect(marginLeft + offSetX_3, marginTop, el1_width, el_height), format);
 
                         tf.DrawString("Tickets", fontParagraph, XBrushes.White,
-                                      new XRect(marginLeft + offSetX_1 * 5, marginTop, el1_width, el_height), format);
+                                      new XRect(marginLeft + offSetX_4, marginTop, el1_width, el_height), format);
 
                         tf.DrawString("Price", fontParagraph, XBrushes.White,
-                                      new XRect(marginLeft + offSetX_1 * 6, marginTop, el1_width, el_height), format);
+                                      new XRect(marginLeft + offSetX_5, marginTop, el1_width, el_height), format);
 
                         // stampo il primo elemento insieme all'header
                         //graph.DrawRectangle(rect_style1, marginLeft, dist_Y2 + marginTop, el1_width, rect_height);
@@ -93,7 +100,7 @@ namespace WebAPI.Helpers
                         //ELEMENT 2 - BIG 380
                         //graph.DrawRectangle(rect_style1, marginLeft + offSetX_1 + interLine_X_1, dist_Y2 + marginTop, el2_width, rect_height);
                         tf.DrawString(
-                            reservation.FlightId.ToString(),
+                            reservation.Flight.CityFrom.Name + "-" + reservation.Flight.CityTo.Name,
                             fontParagraph,
                             XBrushes.Black,
                             new XRect(marginLeft + offSetX_1, marginTop + dist_Y, el1_width, el_height), format);
@@ -106,25 +113,25 @@ namespace WebAPI.Helpers
                             reservation.Name + " " + reservation.Surname,
                             fontParagraph,
                             XBrushes.Black,
-                            new XRect(marginLeft + offSetX_1 * 2, dist_Y + marginTop, el2_width, el_height), format);
+                            new XRect(marginLeft + offSetX_2, dist_Y + marginTop, el2_width, el_height), format);
 
                         tf.DrawString(
                             reservation.Email,
                             fontParagraph,
                             XBrushes.Black,
-                            new XRect(marginLeft + offSetX_1 * 4, dist_Y + marginTop, el1_width, el_height), format);
+                            new XRect(marginLeft + offSetX_3, dist_Y + marginTop, el1_width, el_height), format);
 
                         tf.DrawString(
                             reservation.Tickets.ToString(),
                             fontParagraph,
                             XBrushes.Black,
-                            new XRect(marginLeft + offSetX_1 * 5, dist_Y + marginTop, el1_width, el_height), format);
+                            new XRect(marginLeft + offSetX_4, dist_Y + marginTop, el1_width, el_height), format);
 
                         tf.DrawString(
                             (reservation.Flight.Price * reservation.Tickets).ToString() + "PLN",
                             fontParagraph,
                             XBrushes.Black,
-                            new XRect(marginLeft + offSetX_1 * 6, dist_Y + marginTop, el1_width, el_height), format);
+                            new XRect(marginLeft + offSetX_5, dist_Y + marginTop, el1_width, el_height), format);
                     //}
                     //else
                     //{
