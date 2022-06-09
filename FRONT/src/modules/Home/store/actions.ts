@@ -24,15 +24,27 @@ export const getFlightsByCity = createApiCallWithPayload(
 
 export const getFlight = createApiCallWithPayload(
 	'home/getFlight',
-	(payload: number) =>
-		api.getFlight(payload)
+	(id: number) =>
+		api.getFlight(id)
 )
 
 export const makeReservation = createApiCallWithPayloadReturnResponse(
 	'home/makeReservation',
-	(payload: Reservation) =>
-		api.createReservation(payload)
+	(reservation: Reservation) =>
+		api.createReservation(reservation)
+)
+
+export const getReservation = createApiCallWithPayload(
+	'home/getReservation',
+	(id: number) => api.getReservation(id)
+)
+
+export const generatePdf = createApiCallWithPayloadReturnResponse(
+	'home/generatePdf',
+	(id: number) =>
+		api.generatePdf(id)
 )
 
 export const openBuyTicketDialog = createAction<number>('home/openBuyTicketDialog')
 export const closeBuyTicketDialog = createAction('home/closeBuyTicketDialog')
+export const closeReservationDetailsDialog = createAction('home/closeReservationDetailsDialog')

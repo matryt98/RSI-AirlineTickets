@@ -1,6 +1,6 @@
 import { Box, Grid } from "@mui/material"
 import { useAppDispatch } from "app/hooks"
-import { BuyTicketDialog, FlightSearch, FlightsList, ReservationSearch } from "modules/Home/components"
+import { BuyTicketDialog, FlightSearch, FlightsList, ReservationDetailsDialog, ReservationSearch } from "modules/Home/components"
 import { actions } from "modules/Home/store"
 import { useEffect } from "react"
 
@@ -14,6 +14,7 @@ const Home = () => {
 	return (
 		<Box p={2}>
 			<BuyTicketDialog />
+			<ReservationDetailsDialog/>
 			<Grid container direction="column" justifyContent="center" spacing={2}>
 				<ReservationSearch />
 				<FlightSearch/>

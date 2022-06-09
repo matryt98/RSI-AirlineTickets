@@ -44,6 +44,21 @@ class Api {
 
 		return await this.axios.post('Reservations', reservation, options)
 	}
+
+	public async getReservation(id: number) {
+		return await this.axios.get<Reservation>(`Reservations/${id}`)
+	}
+
+	public async generatePdf(id: number) {
+		const options: AxiosRequestConfig = {
+			responseType: 'blob',
+		}
+
+		const params = new URLSearchParams()
+		params.append('reservationId', id.toString())
+
+		return await this.axios.post(`Reservations/GeneratePDF?${params}`, undefined, options)
+	}
 	
 }
 
