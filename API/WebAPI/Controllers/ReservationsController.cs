@@ -86,21 +86,6 @@ namespace WebAPI.Controllers
             return NoContent();
         }
 
-        // POST: api/Reservations
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Reservation>> PostReservation(Reservation reservation)
-        {
-          if (_context.Reservations == null)
-          {
-              return Problem("Entity set 'DataContext.Reservations'  is null.");
-          }
-            _context.Reservations.Add(reservation);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetReservation", new { id = reservation.Id }, reservation);
-        }
-
         [HttpPost]
         public async Task<ActionResult<Reservation>> MakeReservation(Reservation reservation)
         {
@@ -118,7 +103,7 @@ namespace WebAPI.Controllers
         [Route("GeneratePDF")]
         public async Task GeneratePDFAsync(int reservationId)
         {
-            var reservation = await _context.Reservations.Where(r => r.Id == reservationId).Include(x => x.Flight).Include(x => x.Tickets).ToListAsync();
+            var reservation = await _context.Reservations.Where(r => r.Id == reservationId).Include(x => x.Flight).ToListAsync();
 
             PdfDocument document = new PdfDocument();
             document.Info.Title = "Bought tickets";

@@ -12,6 +12,5 @@ namespace WebAPI.Models.Database
         public DbSet<City> Cities { get; set; } = null!;
         public DbSet<Flight> Flights { get; set; } = null!;
         public DbSet<Reservation> Reservations { get; set; } = null!;
-        public DbSet<Ticket> Tickets { get; set; } = null!;
     }
 }
