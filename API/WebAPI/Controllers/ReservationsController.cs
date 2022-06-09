@@ -102,6 +102,19 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost]
+        public async Task<ActionResult<Reservation>> MakeReservation(Reservation reservation)
+        {
+            if (_context.Reservations == null)
+            {
+                return Problem("Entity set 'DataContext.Reservations'  is null.");
+            }
+            _context.Reservations.Add(reservation);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetReservation", new { id = reservation.Id }, reservation);
+        }
+
+        [HttpPost]
         [Route("GeneratePDF")]
         public async Task GeneratePDFAsync(int reservationId)
         {
@@ -152,7 +165,7 @@ namespace WebAPI.Controllers
                 XSolidBrush rect_style2 = new XSolidBrush(XColors.DarkGreen);
                 XSolidBrush rect_style3 = new XSolidBrush(XColors.Red);
 
-                for (int i = 0; i < reservation.First().Tickets.Count(); i++)
+                for (int i = 0; i < 2; i++)
                 {
                     double dist_Y = lineHeight * (i + 1);
                     double dist_Y2 = dist_Y - 2;
@@ -174,7 +187,6 @@ namespace WebAPI.Controllers
                         tf.DrawString("Price", fontParagraph, XBrushes.White,
                                       new XRect(marginLeft + offSetX_3 + 2 * interLine_X_3, marginTop, el1_width, el_height), format);
 
-                        // stampo il primo elemento insieme all'header
                         graph.DrawRectangle(rect_style1, marginLeft, dist_Y2 + marginTop, el1_width, rect_height);
                         tf.DrawString("text1", fontParagraph, XBrushes.Black,
                                       new XRect(marginLeft, dist_Y + marginTop, el1_width, el_height), format);
@@ -182,7 +194,7 @@ namespace WebAPI.Controllers
                         //ELEMENT 2 - BIG 380
                         graph.DrawRectangle(rect_style1, marginLeft + offSetX_1 + interLine_X_1, dist_Y2 + marginTop, el2_width, rect_height);
                         tf.DrawString(
-                            "text2",
+                            "text1",
                             fontParagraph,
                             XBrushes.Black,
                             new XRect(marginLeft + offSetX_1 + interLine_X_1, dist_Y + marginTop, el2_width, el_height),
