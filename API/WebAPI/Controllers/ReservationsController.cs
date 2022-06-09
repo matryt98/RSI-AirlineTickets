@@ -108,8 +108,14 @@ namespace WebAPI.Controllers
         [Route("GeneratePDF")]
         public async Task<IActionResult> GeneratePDFAsync(int reservationId)
         {
-            var reservation = await _context.Reservations.Where(r => r.Id == reservationId).Include(x => x.Flight).FirstOrDefaultAsync();
+            var reservation = await _context.Reservations
+                .Where(r => r.Id == reservationId)
+                .Include(x => x.Flight.CityFrom)
+                .Include(x => x.Flight.CityTo)
+                .FirstOrDefaultAsync();
 
+            if (reservation == null)
+                return NotFound();
             var bytes = PdfHelper.GeneratePdf(reservation);
 
             return File(bytes, "application/octet-stream", $"Reservation-{reservationId}.pdf");
