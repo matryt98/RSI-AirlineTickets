@@ -90,10 +90,10 @@ namespace WebAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> MakeReservation(Reservation reservation)
         {
-            //if(String.IsNullOrEmpty(reservation.Surname) || String.IsNullOrEmpty(reservation.Name) || reservation.Tickets < 1 || String.IsNullOrEmpty(reservation.Email))
-            //{
-            //    return BadRequest("One or more of the necessarry reservation fields are empty");
-            //}
+            if (String.IsNullOrEmpty(reservation.Surname) || String.IsNullOrEmpty(reservation.Name) || reservation.Tickets < 1 || String.IsNullOrEmpty(reservation.Email))
+            {
+                return BadRequest("One or more of the necessarry reservation fields are empty");
+            }
 
             _context.Reservations.Add(reservation);
 
