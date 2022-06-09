@@ -15,6 +15,7 @@ using System.Xml.XPath;
 using MigraDocCore.Rendering;
 using PdfSharpCore.Drawing.Layout;
 using WebAPI.Helpers;
+using WebAPI.Filters;
 
 namespace WebAPI.Controllers
 {
@@ -88,6 +89,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost]
+        [ServiceFilter(typeof(ReservationValidatorFilter))]
         public async Task<IActionResult> MakeReservation(Reservation reservation)
         {
             if (String.IsNullOrEmpty(reservation.Surname) || String.IsNullOrEmpty(reservation.Name) || reservation.Tickets < 1 || String.IsNullOrEmpty(reservation.Email))
