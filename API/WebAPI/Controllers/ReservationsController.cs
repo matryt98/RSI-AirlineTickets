@@ -90,6 +90,7 @@ namespace WebAPI.Controllers
 
         [HttpPost]
         [ServiceFilter(typeof(ReservationValidatorFilter))]
+        [ServiceFilter(typeof(AuthenticationFilter))]
         public async Task<IActionResult> MakeReservation(Reservation reservation)
         {
             _context.Reservations.Add(reservation);
