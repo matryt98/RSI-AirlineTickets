@@ -33,8 +33,8 @@ namespace WebAPI.Filters
             string username = usernamePassword.Split(':')[0];
             string password = usernamePassword.Split(':')[1];
 
-            var user = _context.User.Where(u => u.Login == username && u.Password == password);//if (username != "aaa" || password != "bbb")
-            if (user != null)
+            //var user = _context.User.Where(u => u.Login == username && u.Password == password);//if (username != "aaa" || password != "bbb")
+            if (!_context.User.Any(u => u.Login == username && u.Password == password))
                 context.Result = new UnauthorizedResult();
         }
         public void OnActionExecuted(ActionExecutedContext context)
