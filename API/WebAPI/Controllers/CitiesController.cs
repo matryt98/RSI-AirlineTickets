@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using WebAPI.Helpers;
 using WebAPI.Models.Database;
 
 namespace WebAPI.Controllers
@@ -31,13 +32,44 @@ namespace WebAPI.Controllers
 
         // GET: api/Cities/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<City>> GetCity(int id)
+        public async Task<ActionResult<City>> GetCity(int id, [FromHeader(Name = "Accept")] string accept)
         {
           if (_context.Cities == null)
           {
               return NotFound();
           }
+
             var city = await _context.Cities.FindAsync(id);
+
+        if (accept.EndsWith("hateoas"))
+        {
+            var link = new LinkHelper<City>(city);
+            link.Links.Add(new Link
+            {
+                Href = Url.Link("", new { city.Id }),
+                Rel = "self",
+                method = "GET"
+            });
+            link.Links.Add(new Link
+            {
+                Href = Url.Link("", new { city.Id }),
+                Rel = "post-city",
+                method = "POST"
+            });
+            link.Links.Add(new Link
+            {
+                Href = Url.Link("", new { city.Id }),
+                Rel = "put-city",
+                method = "PUT"
+            });
+            link.Links.Add(new Link
+            {
+                Href = Url.Link("", new { city.Id }),
+                Rel = "delete-city",
+                method = "DELETE"
+            });
+            return new ObjectResult(link);
+        }
 
             if (city == null)
             {
