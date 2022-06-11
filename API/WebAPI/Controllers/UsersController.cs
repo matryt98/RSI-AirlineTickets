@@ -10,8 +10,6 @@ using WebAPI.Models.Database;
 
 namespace WebAPI.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
     public class UsersController : BaseApiController
     {
         private readonly DataContext _context;
