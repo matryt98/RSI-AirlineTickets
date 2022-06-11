@@ -25,8 +25,6 @@ const FlightSearch = () => {
 			cityFrom: cityFrom?.name,
 			cityTo: cityTo?.name
 		}))
-		.unwrap()
-		.then(data => console.log(data))
 	}
 	
 	return (

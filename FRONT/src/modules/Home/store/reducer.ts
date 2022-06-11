@@ -52,6 +52,9 @@ export default createReducer(initialState, builder =>
 		.addCase(actions.closeReservationDetailsDialog, state => {
 			state.isReservationDetailsDialogOpen = false
 		})
+		.addCase(actions.authenticate.fulfilled, state => {
+			state.isAuthDialogOpen = false
+		})
 		.addMatcher(
 			isAnyOf(
 				actions.closeBuyTicketDialog,
