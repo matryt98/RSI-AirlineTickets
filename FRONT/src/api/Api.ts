@@ -1,6 +1,7 @@
 import { AxiosRequestConfig } from 'axios'
-import { City, Flight, FlightDto, Reservation } from 'types/interfaces'
+import { AuthFormValues, City, Flight, FlightDto, Reservation } from 'types/interfaces'
 import axiosInstance from './axios'
+import { Buffer } from 'buffer'
 
 /**
  * This class is used for communication with API
@@ -37,9 +38,12 @@ class Api {
 		return await this.axios.get<Flight>(`Flights/${id}`)
 	}
 
-	public async createReservation(reservation: Reservation) {
+	public async createReservation(reservation: Reservation, authInfo: AuthFormValues) {
 		const options: AxiosRequestConfig = {
 			responseType: 'blob',
+			headers: {
+				"Authorization": `Basic ${Buffer.from(`${authInfo.login}:${authInfo.password}`).toString('base64')}`
+			},
 		}
 
 		return await this.axios.post('Reservations', reservation, options)
@@ -58,6 +62,16 @@ class Api {
 		params.append('reservationId', id.toString())
 
 		return await this.axios.post(`Reservations/GeneratePDF?${params}`, undefined, options)
+	}
+
+	public async authenticate(payload: AuthFormValues) {
+		const options: AxiosRequestConfig = {
+			headers: {
+				"Authorization": `Basic ${Buffer.from(`${payload.login}:${payload.password}`).toString('base64')}`
+			},
+		}
+
+		return await this.axios.post('Users/Authenticate', undefined, options)
 	}
 	
 }

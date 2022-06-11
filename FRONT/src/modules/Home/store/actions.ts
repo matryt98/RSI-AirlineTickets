@@ -1,12 +1,17 @@
 import { createAction } from "@reduxjs/toolkit"
 import { Api } from "api"
 import { createApiCall, createApiCallWithPayload, createApiCallWithPayloadReturnResponse } from "app/helpers/store"
-import { Reservation } from "types/interfaces"
+import { AuthFormValues, Reservation } from "types/interfaces"
 
 interface GetFlightsByCityPayload {
 	date: Date
 	cityFrom?: string
 	cityTo?: string
+}
+
+interface MakeReservationPayload {
+	reservation: Reservation
+	authInfo: AuthFormValues
 }
 
 const api = new Api()
@@ -30,8 +35,8 @@ export const getFlight = createApiCallWithPayload(
 
 export const makeReservation = createApiCallWithPayloadReturnResponse(
 	'home/makeReservation',
-	(reservation: Reservation) =>
-		api.createReservation(reservation)
+	(payload: MakeReservationPayload) =>
+		api.createReservation(payload.reservation, payload.authInfo)
 )
 
 export const getReservation = createApiCallWithPayload(
@@ -45,6 +50,14 @@ export const generatePdf = createApiCallWithPayloadReturnResponse(
 		api.generatePdf(id)
 )
 
-export const openBuyTicketDialog = createAction<number>('home/openBuyTicketDialog')
+export const authenticate = createApiCallWithPayload(
+	'home/authenticate',
+	(payload: AuthFormValues) => api.authenticate(payload)
+)
+
+export const setSelectedFlightId = createAction<number>('home/setSelectedFlightId')
+export const openBuyTicketDialog = createAction<AuthFormValues>('home/openBuyTicketDialog')
 export const closeBuyTicketDialog = createAction('home/closeBuyTicketDialog')
 export const closeReservationDetailsDialog = createAction('home/closeReservationDetailsDialog')
+export const openAuthDialog = createAction('home/openAuthDialog')
+export const closeAuthDialog = createAction('home/closeAuthDialog')

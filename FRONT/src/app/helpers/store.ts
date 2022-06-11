@@ -1,6 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
 import { AxiosResponse } from "axios"
 import { hideLoader, showError, showLoader } from "modules/Shared/store"
+import { extractErrorMessage } from "app/helpers/response"
 
 /**
  * This method is used for creating actions making parametrized calls to API
@@ -23,9 +24,9 @@ export const createApiCallWithPayload = <T, P>(actionName: string, apiCall: (pay
 			return response.data
 		}
 		catch (err: any) {
-			const errorMessage = err.response ? `${err.response.status} - ${err.response.statusText} ${typeof err.response?.data === 'string' ? err.response?.data : ''}` : err
-			thunkAPI.dispatch(showError(String(errorMessage)))
-			return thunkAPI.rejectWithValue(String(errorMessage))
+			const errorMessage = extractErrorMessage(err)
+			thunkAPI.dispatch(showError(errorMessage))
+			return thunkAPI.rejectWithValue(errorMessage)
 		}
 	}
 )
@@ -53,9 +54,9 @@ export const createApiCall = <T>(actionName: string, apiCall: Promise<AxiosRespo
 			return response.data
 		}
 		catch (err: any) {
-			const errorMessage = err.response ? `${err.response.status} - ${err.response.statusText} ${typeof err.response?.data === 'string' ? err.response?.data : ''}` : err
-			thunkAPI.dispatch(showError(String(errorMessage)))
-			return thunkAPI.rejectWithValue(String(errorMessage))
+			const errorMessage = extractErrorMessage(err)
+			thunkAPI.dispatch(showError(errorMessage))
+			return thunkAPI.rejectWithValue(errorMessage)
 		}
 	}
 )
@@ -83,9 +84,9 @@ export const createApiCallWithPayloadReturnResponse = <T, P>(actionName: string,
 			return response
 		}
 		catch (err: any) {
-			const errorMessage = err.response ? `${err.response.status} - ${err.response.statusText} ${typeof err.response?.data === 'string' ? err.response?.data : ''}` : err
-			thunkAPI.dispatch(showError(String(errorMessage)))
-			return thunkAPI.rejectWithValue(String(errorMessage))
+			const errorMessage = extractErrorMessage(err)
+			thunkAPI.dispatch(showError(errorMessage))
+			return thunkAPI.rejectWithValue(errorMessage)
 		}
 	}
 )

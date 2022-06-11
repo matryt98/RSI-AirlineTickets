@@ -49,3 +49,8 @@ export interface Reservation extends Entity {
 	email: string
 	tickets: number
 }
+
+export interface AuthFormValues {
+	login: string
+	password: string
+}

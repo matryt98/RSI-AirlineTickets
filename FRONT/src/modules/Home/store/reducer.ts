@@ -1,5 +1,5 @@
 import { createReducer, isAnyOf } from "@reduxjs/toolkit"
-import { City, FlightDto, Reservation } from "types/interfaces"
+import { AuthFormValues, City, FlightDto, Reservation } from "types/interfaces"
 import * as actions from './actions'
 
 interface State {
@@ -9,6 +9,8 @@ interface State {
 	selectedFlightId: number
 	isReservationDetailsDialogOpen: boolean
 	reservation: Reservation | null
+	isAuthDialogOpen: boolean
+	authInfo: AuthFormValues | null
 }
 
 const initialState: State = {
@@ -18,13 +20,24 @@ const initialState: State = {
 	selectedFlightId: 0,
 	isReservationDetailsDialogOpen: false,
 	reservation: null,
+	isAuthDialogOpen: false,
+	authInfo: null
 }
 
 export default createReducer(initialState, builder =>
 	builder
-		.addCase(actions.openBuyTicketDialog, (state, action) => {
+		.addCase(actions.setSelectedFlightId, (state, action) => {
 			state.selectedFlightId = action.payload
+		})
+		.addCase(actions.openBuyTicketDialog, (state, action) => {
+			state.authInfo = action.payload
 			state.isBuyTicketDialogOpen = true
+		})
+		.addCase(actions.openAuthDialog, state => {
+			state.isAuthDialogOpen = true
+		})
+		.addCase(actions.closeAuthDialog, state => {
+			state.isAuthDialogOpen = false
 		})
 		.addCase(actions.getCities.fulfilled, (state, action) => {
 			state.cities = action.payload
