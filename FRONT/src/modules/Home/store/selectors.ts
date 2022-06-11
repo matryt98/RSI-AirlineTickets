@@ -6,3 +6,5 @@ export const isBuyTicketDialogOpen = (state: RootState) => state.home.isBuyTicke
 export const selectedFlightId = (state: RootState) => state.home.selectedFlightId
 export const isReservationDetailsDialogOpen = (state: RootState) => state.home.isReservationDetailsDialogOpen
 export const reservation = (state: RootState) => state.home.reservation
+export const isAuthDialogOpen = (state: RootState) => state.home.isAuthDialogOpen
+export const getAuthInfo = (state: RootState) => state.home.authInfo

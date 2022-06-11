@@ -15,7 +15,8 @@ const Flight = (props: FlightProps) => {
 	const dispatch = useAppDispatch()
 
 	const handleBuyTicket = () => {
-		dispatch(actions.openBuyTicketDialog(flight.id))
+		dispatch(actions.setSelectedFlightId(flight.id))
+		dispatch(actions.openAuthDialog())
 	}
 
 	return (

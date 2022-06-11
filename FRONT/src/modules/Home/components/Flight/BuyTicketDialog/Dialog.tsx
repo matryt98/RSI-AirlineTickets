@@ -21,6 +21,7 @@ const BuyTicketDialog = () => {
 
 	const isOpen = useSelector(selectors.isBuyTicketDialogOpen)
 	const flightId = useSelector(selectors.selectedFlightId)
+	const authInfo = useSelector(selectors.getAuthInfo)
 
 	const [flight, setFlight] = useState<Flight | null>(null)
 	const [values, setValues] = useState(initialFormValues)
@@ -41,13 +42,17 @@ const BuyTicketDialog = () => {
 	}
 
 	const handleSubmit = () => {
+		if(authInfo)
 		dispatch(actions.makeReservation({
-			name: values.name,
-			surname: values.surname,
-			email: values.email,
-			tickets: values.numberOfTickets,
-			flightId: flightId,
-			id: 0,
+			reservation: {
+				name: values.name,
+				surname: values.surname,
+				email: values.email,
+				tickets: values.numberOfTickets,
+				flightId: flightId,
+				id: 0,
+			},
+			authInfo: authInfo
 		}))
 		.unwrap()
 		.then((response) => {
