@@ -97,6 +97,12 @@ namespace WebAPI.Controllers
 
             await _context.SaveChangesAsync();
 
+            var res = await _context.Reservations
+                .Where(r => r.Id == reservation.Id)
+                .Include(x => x.Flight.CityFrom)
+                .Include(x => x.Flight.CityTo)
+                .FirstOrDefaultAsync();
+
             var bytes = PdfHelper.GeneratePdf(reservation);
 
             return File(bytes, "application/octet-stream", $"Reservation-{reservation.Id}.pdf");
