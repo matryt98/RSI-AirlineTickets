@@ -103,7 +103,7 @@ namespace WebAPI.Controllers
                 .Include(x => x.Flight.CityTo)
                 .FirstOrDefaultAsync();
 
-            var bytes = PdfHelper.GeneratePdf(reservation);
+            var bytes = PdfHelper.GeneratePdf(res);
 
             return File(bytes, "application/octet-stream", $"Reservation-{reservation.Id}.pdf");
         }
