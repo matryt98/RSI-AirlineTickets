@@ -92,11 +92,6 @@ namespace WebAPI.Controllers
         [ServiceFilter(typeof(ReservationValidatorFilter))]
         public async Task<IActionResult> MakeReservation(Reservation reservation)
         {
-            if (String.IsNullOrEmpty(reservation.Surname) || String.IsNullOrEmpty(reservation.Name) || reservation.Tickets < 1 || String.IsNullOrEmpty(reservation.Email))
-            {
-                return BadRequest("One or more of the necessarry reservation fields are empty");
-            }
-
             _context.Reservations.Add(reservation);
 
             await _context.SaveChangesAsync();

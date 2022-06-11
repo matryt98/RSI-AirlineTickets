@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using WebAPI.Filters;
 using WebAPI.Helpers;
 using WebAPI.Models.Database;
 
@@ -24,6 +25,8 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddScoped<ReservationValidatorFilter>();
+builder.Services.AddScoped<AuthenticationFilter>();
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddDbContext<DataContext>(opt =>
     opt.UseInMemoryDatabase("Database"));
